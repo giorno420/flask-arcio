@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <title>Earn coins</title>
+
+	<head>
+<script async src="https://arc.io/widget.min.js#yourArcCode"></script>
+
+</head>
+
+	<h1 style="text-decoration:underline; text-align:center">Coin earning page</h1>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/static/js/timeme.js"></script>
+<script>
+
+TimeMe.initialize({currentPageName: "yourpagename", idleTimeoutInSeconds: 99999999999999999999999999999999999999999999, });
+
+window.onload = function() {
+	
+	setInterval(function() {
+		let uptime = TimeMe.getTimeOnCurrentPageInMilliseconds();
+        let seconds = parseInt(uptime / 1000);
+		let minutes = parseInt(seconds / 60);
+
+		uptime = `${seconds} seconds`
+		
+	    document.getElementById('timeInSeconds').textContent = uptime
+        
+	}, 37);
+}
+
+
+setInterval(function() {
+    $.ajax({
+        type: "POST", 
+        url:  "/earn", 
+        data: JSON.stringify({
+            type: 'arc', 
+            coins: Math.floor(TimeMe.getTimeOnCurrentPageInSeconds() / 60), // how many coins you're gonna get. Make sure its the same as the interval in seconds or it'll break
+            time: Math.floor(TimeMe.getTimeOnCurrentPageInSeconds()), 
+            ms: TimeMe.getTimeOnCurrentPageInMilliseconds(), 
+        }), contentType: 'application/json'})
+    }, 60000 // how many milliseconds will you earn coins in
+);
+
+    </script>
+
+	<p id="timeInSeconds" method="POST" style="text-align:center"></p>
+    
+</html>

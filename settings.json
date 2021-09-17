@@ -1,0 +1,7 @@
+{
+    "id": "Discord Oauth2 ID",
+    "secret": "Discord Client secret",
+    "redirect_uri": "Oauth2 Redirect URI",
+    "insecuretransport": "true for testing, false for production",
+    "token": "Discord Bot Token"
+}
