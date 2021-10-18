@@ -8,6 +8,8 @@ An AFK earning page to track and manage afk time for https://arc.io/ like those 
  - Choose whether production mode, or test mode is right for you.
  - Select a location. Keep in mind you can't change it later.
  - Wait for it to finish
+ - Wait for it to finish
+ - Wait for it to finish
  - At the top left corner, you'll see the Firebase logo, and under that, the Project settings. Click on the settings gear icon
  - Move to "Service Accounts"
  - Select "Generate new private key"
