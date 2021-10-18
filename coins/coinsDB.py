@@ -1,50 +1,73 @@
 import json
+import firebase_admin
+import google.api_core.exceptions as googleException
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 
-def saveChanges(changes: dict):
-	with open("static/js/coins.json", "w") as coin_:
-		json.dump(changes, coin_)
+firestoreCredentials = credentials.Certificate("firestore-credentials.json")
+firebase_admin.initialize_app(firestoreCredentials)
 
-def addCoins(userID, coinsAmount):
-    with open("static/js/coins.json") as coin:
-        coins = json.load(coin)
-    if userID in coins:
-        if coins[userID] <= coinsAmount:
-            if coins is None:
-                return
-            elif coins is not None:
-                coins[userID] = coinsAmount
-                saveChanges(coins)
-        elif coins[userID] > coinsAmount:
-            coins[userID] += 1
-    elif userID not in coins:
-        coins[userID] = 1
-    saveChanges(coins)
+firestoreDB = firestore.client()
+coinsConnectionPath = firestoreDB.collection("coins")
+
+
+def addCoins(userID):
+    userID = str(userID)
+    
+    try:
+        coinsPath = coinsConnectionPath.document(userID)
+        coinsPath.update({"userid": userID})
+
+        try:
+            totalcoins = coinsPath.get().to_dict()["coins"]
+            coinsPath.update({"coins": totalcoins + 1})
+        except KeyError:
+            coinsPath.update({"coins": 1})
+    except googleException.NotFound:
+        coinsPath = coinsConnectionPath.document(userID).create({})
+
 
 def checkIfExists(discordUserId):
-    with open("static/js/coins.json") as coin:
-        coins = json.load(coin)
-    if discordUserId in coins:
-        pass
-    elif discordUserId not in coins:
-        coins[str(discordUserId)] = 1
+
+    try:
+        coinsPath = coinsConnectionPath.document(discordUserId)
+        coinsPath.update({"userid": discordUserId})
+        try:
+            coinsPath.update({"userid": discordUserId})
+            coinsPath.get().to_dict()["coins"]
+
+        except KeyError:
+            coinsPath.update({"userid": discordUserId})
+            coinsPath.update({"coins": 1})
+
+    except googleException.NotFound:
+        coinsConnectionPath.document(discordUserId).create({
+            "userid": discordUserId, 
+            "coins": 1
+        })
 
 def removeCoins(userID, coinsToRemove):
-    with open("static/js/coins.json") as coin:
-        coins = json.load(coin)
-    try:
-        if userID in coins:
-            if coins[userID] <= coinsToRemove:
-                return False
-            elif coins[userID] > coinsToRemove:
-                coins[userID] = coins[userID] - coinsToRemove
-                return True
-        elif userID not in coins:
-            coins[userID] = 1
-            return False
-    except KeyError:
-        return False
-    except IndexError:
-        return False
+    
+	userID = str(userID)
 
-    saveChanges(coins)
+	coinsPath = coinsConnectionPath.document(userID)
+	coinsPath.update({"userid": userID})
+    
+	checkIfExists(userID)
+
+	coins = coinsPath.get().to_dict()["coins"]
+    
+	if coins < coinsToRemove:
+		return False
+
+	elif coins >= coinsToRemove:
+		coinsPath.update({"coins": coins - coinsToRemove})
+		return True
+
+
+def getallcoins() -> list:
+    coinsList = []
+    for userData in coinsConnectionPath.get():
+        coinsList.append(userData.to_dict())
+    return coinsList
