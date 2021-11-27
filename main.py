@@ -59,7 +59,7 @@ def earncoins():
 			pass
 
 		elif type(request.get_json()) is dict:
-			coinsDB.addCoins(str(user.id), int(request.get_json()["coins"]))
+			coinsDB.addCoins(str(user.id))
 
 		return render_template("earning.html")
 

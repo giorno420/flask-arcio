@@ -1,23 +1,16 @@
 # flask-arc
-An AFK earning page to track and manage afk time for https://arc.io/ like those hosting platforms have
+An AFK earning page to track and manage inactive time for ads and arc.io and shit idk GOD i need to go outside
 
 
-## <strike>How to setup:</strike>
- - <strike>Go to https://console.firebase.google.com/ and create a new project. Make sure to give it a good name.</strike>
- - <strike>On the left pane, you'll see a section named "Firestore Database". Open that, and click on "Create database".</strike>
- - <strike>Choose whether production mode, or test mode is right for you.</strike>
- - <strike>Select a location. Keep in mind you can't change it later.</strike>
- - <strike>Wait for it to finish</strike>
- - <strike>Wait for it to finish</strike>
- - <strike>Wait for it to finish</strike>
- - <strike>At the top left corner, you'll see the Firebase logo, and under that, the Project settings. Click on the settings gear icon</strike>
- - <strike>Move to "Service Accounts"</strike>
- - <strike>Select "Generate new private key"</strike>
- - <strike>Take the file you just downloaded, and rename it to "firebase-credentials.json"</strike>
- - <strike>Replace the file with the same name in this repository with the one you just downloaded</strike>
- - <strike>Congratulations! You successfully set up a Firestore Database! The webserver automatically runs on 0.0.0.0 and port 8080, but you can change that.</strike>
+## How to setup:
+ - Go to https://cloud.mongodb.com/, or make your own MongoDB database instance
+ - Wait for it to finish
+ - Wait for it to finish
+ - Wait for it to finish
+ - Get your cluster connection URL, and paste it into the `cluster` variable in coins/coinsDB.py
+ - Congratulations! You successfully set up a MongoDB Database! The webserver automatically runs on 0.0.0.0 and port 8080, but you can change that in the `main.py` file
 
-<strike>Everything else is customisable as well!</strike>
+Everything else is customisable as well!
 
-
-gonna switch to mongodb soon since this isn't for websites with big traffic lol
+<br><br>
+aight bye

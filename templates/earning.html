@@ -2,8 +2,7 @@
 <html>
     <title>Earn coins</title>
 
-	<head>
-<script async src="https://arc.io/widget.min.js#yourArcCode"></script>
+	<head>  
 
 </head>
 
@@ -36,11 +35,11 @@ setInterval(function() {
         url:  "/earn", 
         data: JSON.stringify({
             type: 'arc', 
-            coins: Math.floor(TimeMe.getTimeOnCurrentPageInSeconds() / 60), // how many coins you're gonna get. Make sure its the same as the interval in seconds or it'll break
+            coins: Math.floor(TimeMe.getTimeOnCurrentPageInSeconds() / 60),
             time: Math.floor(TimeMe.getTimeOnCurrentPageInSeconds()), 
             ms: TimeMe.getTimeOnCurrentPageInMilliseconds(), 
         }), contentType: 'application/json'})
-    }, 60000 // how many milliseconds will you earn coins in
+    }, 60000
 );
 
     </script>

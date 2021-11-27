@@ -1,73 +1,72 @@
-import json
-import firebase_admin
-import google.api_core.exceptions as googleException
-from firebase_admin import credentials
-from firebase_admin import firestore
+import pymongo
 
 
-firestoreCredentials = credentials.Certificate("firestore-credentials.json")
-firebase_admin.initialize_app(firestoreCredentials)
-
-firestoreDB = firestore.client()
-coinsConnectionPath = firestoreDB.collection("coins")
-
+cluster = pymongo.MongoClient("mongodb+srv://YOUR_MONGO_USERNAME:YOUR_MONGO_PASSWORD@YOUR_MONGO_CLUSTER.mongodb.net/test?ssl=true&ssl_cert_reqs=CERT_NONE")
+db = cluster["CLUSTER_NAME"]
+coinsCluster = db.userdata
 
 def addCoins(userID):
-    userID = str(userID)
+    userID = int(userID)
+    coinsCluster.update_one({"_id": userID}, {"$inc": {"coins": 1}})
+
+
+def checkIfExists(discordUserId, discordUsername):
+
+	discordUserId = int(discordUserId)
+	exists = False
+	results = coinsCluster.find({"_id": discordUserId})
     
-    try:
-        coinsPath = coinsConnectionPath.document(userID)
-        coinsPath.update({"userid": userID})
+	for result in results:
+		try:
+			if result["coins"] is int:
+				try:
+					if result["username"] is str:
+						try:
+							if result["minecraft"] is str:
+								exists = True
+						except KeyError:
+							coinsCluster.update_one({"_id": discordUserId}, {"minecraft": "None"})
+				except KeyError:
+					coinsCluster.update_one({"_id": discordUserId, "username": discordUsername})
+		except KeyError:
+			coinsCluster.update_one({"_id": discordUserId}, {"coins": 1})
+	if not exists:
+		try:
+			coinsCluster.insert_one({"_id": discordUserId, "username": discordUsername, "coins": 1, "minecraft": "None"})
+		except pymongo.errors.DuplicateKeyError:
+			pass
+    
 
-        try:
-            totalcoins = coinsPath.get().to_dict()["coins"]
-            coinsPath.update({"coins": totalcoins + 1})
-        except KeyError:
-            coinsPath.update({"coins": 1})
-    except googleException.NotFound:
-        coinsPath = coinsConnectionPath.document(userID).create({})
-
-
-def checkIfExists(discordUserId):
-
-    try:
-        coinsPath = coinsConnectionPath.document(discordUserId)
-        coinsPath.update({"userid": discordUserId})
-        try:
-            coinsPath.update({"userid": discordUserId})
-            coinsPath.get().to_dict()["coins"]
-
-        except KeyError:
-            coinsPath.update({"userid": discordUserId})
-            coinsPath.update({"coins": 1})
-
-    except googleException.NotFound:
-        coinsConnectionPath.document(discordUserId).create({
-            "userid": discordUserId, 
-            "coins": 1
-        })
 
 def removeCoins(userID, coinsToRemove):
-    
-	userID = str(userID)
 
-	coinsPath = coinsConnectionPath.document(userID)
-	coinsPath.update({"userid": userID})
-    
-	checkIfExists(userID)
+    coins = coinsCluster.find({"_id": userID})
+    data = 0
 
-	coins = coinsPath.get().to_dict()["coins"]
+    for result in coins:
+        data = result["coins"]
     
-	if coins < coinsToRemove:
-		return False
+    if data < coinsToRemove:
+        return False
 
-	elif coins >= coinsToRemove:
-		coinsPath.update({"coins": coins - coinsToRemove})
-		return True
+    elif data >= coinsToRemove:
+        coinsToRemove -= coinsToRemove * 2
+        coinsCluster.update_one({"_id": userID}, {"$inc": {"coins": coinsToRemove}})
+        return True
 
 
 def getallcoins() -> list:
-    coinsList = []
-    for userData in coinsConnectionPath.get():
-        coinsList.append(userData.to_dict())
-    return coinsList
+    coinlist = []
+    data = coinsCluster.find({})
+    for result in data:
+        coinlist.append({"userid": result["_id"], "coins": result["coins"]})
+    return coinlist
+
+
+def getallusernames() -> list:
+    coinlist = []
+    data = coinsCluster.find({})
+    for result in data:
+        coinlist.append({"userid": result["_id"], "username": result["username"]})
+    return coinlist
+

@@ -1,3 +1,4 @@
 Flask==1.0
 Flask-Discord==0.1.64
 requests==2.25.1
+pymongo==3.12.0
